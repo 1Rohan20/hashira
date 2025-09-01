@@ -1,13 +1,6 @@
-const fs = require('fs');
+const fs = require("fs")
+const input = JSON.parse(fs.readFileSync('case2.json', 'utf-8'));
 
-// Read and parse the input JSON file
-const input = JSON.parse(fs.readFileSync('input.json', 'utf-8'));
-
-function toDecimal(base, value) {
-  return parseInt(value, base);
-}
-
-const n = input.keys.n;
 const k = input.keys.k;
 const m = k - 1;
 
@@ -33,9 +26,7 @@ function getMonicCoefficients(roots) {
     return coeffs.map(x => x.toString()); // Convert back to string for output
 }
 
-const coeffs = buildPolynomial(selectedRoots);
+const coefficients = getMonicCoefficients(roots);
 
-// ---- Output ----
-console.log("Polynomial coefficients (low → high degree):");
-console.log(coeffs); 
-// Example: [c0, c1, c2, ...] means c0 + c1*x + c2*x^2 + ...
+console.log("Coefficients from highest to lowest degree:");
+console.log(coefficients);
