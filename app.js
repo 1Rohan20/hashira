@@ -16,18 +16,15 @@ Object.keys(input).forEach((key) => {
 roots.sort((a, b) => a - b);
 console.log("Decoded roots:", roots);
 
-// ---- Step 2: Use first k roots ----
+
 const k = input.keys.k;
 const selected = roots.slice(0, k);
 console.log("Using roots:", selected);
 
-// ---- Step 3: Solve quadratic coefficients ----
+
 function solveQuadratic(roots) {
   const [x1, x2, x3] = roots;
 
-  // System:
-  // a*x^2 + b*x + c = 0
-  // We'll set up equations and solve using linear algebra (Cramer's rule)
 
   const A = [
     [x1*x1, x1, 1],
@@ -36,7 +33,7 @@ function solveQuadratic(roots) {
   ];
   const B = [0, 0, 0];
 
-  // Function to compute determinant
+ 
   function det(mat) {
     return (
       mat[0][0]*(mat[1][1]*mat[2][2] - mat[1][2]*mat[2][1]) -
@@ -51,19 +48,15 @@ function solveQuadratic(roots) {
     return null;
   }
 
-  // Replace columns with B (all zeros) => everything becomes 0
-  // That means the trivial solution is only possible if we allow scaling.
-  // So instead, we can directly form quadratic as:
-  // (x - r1)(x - r2) expanded, then check r3
+
   let a = 1;
   let b = -(x1 + x2);
   let c = x1*x2;
 
-  // Verify root3 (should be approx 0 if consistent)
   let check = a*x3*x3 + b*x3 + c;
   console.log("Check with 3rd root:", check);
 
-  return [c, b, a]; // [c0, c1, c2]
+  return [c, b, a]; 
 }
 
 const coeffs = solveQuadratic(selected);
