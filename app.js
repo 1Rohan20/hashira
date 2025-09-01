@@ -1,34 +1,53 @@
 const fs = require('fs');
 
-// Read and parse the input JSON file
-const input = JSON.parse(fs.readFileSync('input.json', 'utf-8'));
 
+const input = JSON.parse(fs.readFileSync('imput2.json', 'utf-8'));
+
+function toDecimal(base, value) {
+  return parseInt(value, base);
+}
+
+const n = input.keys.n;
 const k = input.keys.k;
-const m = k - 1;
 
-// Convert first k roots to decimal (BigInt)
-const roots = [];
-for (let i = 1; i <= k; ++i) {
-    const root = input[i.toString()];
-    roots.push(BigInt(parseInt(root.value, parseInt(root.base))));
-}
+let roots = [];
+Object.keys(input).forEach((key) => {
+  if (key !== "keys") {
+    const base = parseInt(input[key].base, 10);
+    const val = input[key].value;
+    roots.push(toDecimal(base, val));
+  }
+});
 
-// Vieta’s formulas for a monic polynomial
-// Coefficients: [c_m, c_{m-1}, ..., c_0] for x^m + c_{m-1}x^{m-1} + ... + c_0
-function getMonicCoefficients(roots) {
-    let n = roots.length;
-    // Start with [2] (which stands for p(x) = 1)
-    let coeffs = [BigInt(1)];
-    for (let i = 0; i < n; i++) {
-        coeffs.push(BigInt(0));
-        for (let j = coeffs.length - 1; j > 0; j--) {
-            coeffs[j] = coeffs[j] - roots[i] * coeffs[j-1];
-        }
+// Just to be safe, sort them
+roots.sort((a, b) => a - b);
+
+console.log("Decoded roots:", roots);
+
+// ---- Take first k roots to build polynomial ----
+const selectedRoots = roots.slice(0, k);
+console.log("Using roots (first k):", selectedRoots);
+
+// ---- Build polynomial coefficients ----
+// For roots r1, r2, ..., rm
+// Polynomial = (x - r1)(x - r2)... = x^m + a_{m-1}x^(m-1) + ... + a0
+function buildPolynomial(roots) {
+  let coeffs = [1]; // start with "1"
+
+  for (let r of roots) {
+    let newCoeffs = new Array(coeffs.length + 1).fill(0);
+    for (let i = 0; i < coeffs.length; i++) {
+      newCoeffs[i] += -r * coeffs[i]; // multiply by (-r)
+      newCoeffs[i + 1] += coeffs[i];  // multiply by x
     }
-    return coeffs.map(x => x.toString()); // Convert back to string for output
+    coeffs = newCoeffs;
+  }
+  return coeffs;
 }
 
-const coefficients = getMonicCoefficients(roots);
+const coeffs = buildPolynomial(selectedRoots);
 
-console.log("Coefficients from highest to lowest degree:");
-console.log(coefficients);
+// ---- Output ----
+console.log("Polynomial coefficients (low → high degree):");
+console.log(coeffs); 
+// Example: [c0, c1, c2, ...] means c0 + c1*x + c2*x^2 + ...
